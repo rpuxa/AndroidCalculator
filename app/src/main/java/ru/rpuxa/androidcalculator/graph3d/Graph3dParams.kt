@@ -7,8 +7,9 @@ data class Graph3dParams(
     var polygonsCount: Int,
 
     @CallFromNative
-    var polygonSize: Float,
-
+    var polygonSize: Float
+) {
     @CallFromNative
-    var polygonStart: Float = (polygonSize * polygonsCount) / -2
-)
+    val polygonStart
+        get() = (polygonSize * polygonsCount) / -2
+}

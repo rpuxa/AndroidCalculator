@@ -1,6 +1,7 @@
 #include <math.h>
 #include <malloc.h>
 #include <jni.h>
+#include <time.h>
 
 #define NaN 0.0f / 0.0f
 
@@ -90,7 +91,9 @@ void project_points(
         float newZ = a13 * x + a23 * y + a33 * z;
 
         if (newY < 0) {
-            //  points[2] = NaN;
+              points[0] = NaN;
+              points[1] = NaN;
+              points[2] = NaN;
         } else {
             float tmp = focus / (newY + focus);
             float __x = newX * tmp + halfScreenWidth;
@@ -150,7 +153,7 @@ for (int i = 0; i < 48; ++i) {
 array;
  */
 
-JNIEXPORT void JNICALL
+JNIEXPORT jdouble JNICALL
 Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
         JNIEnv *env,
         jclass type,
@@ -221,11 +224,14 @@ Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
 
     merge_sort(polygons, totalPolygonsCount);
 
+
     jfloat *points = e->GetFloatArrayElements(env, graph, NULL);
     jint pointsCount = e->GetArrayLength(env, graph);
 
+
     project_points(cameraX, cameraY, cameraZ, horizontalAngle, verticalAngle, cameraWidth,
                    cameraHeight, screenWidth, screenHeight, focus, points, pointsCount / 3);
+
 
     int newPointsIndex = 0;
     int newPointsSize = totalPolygonsCount * 12;
@@ -309,19 +315,13 @@ Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
         colors += 6;
     }
 
-    /*  for (int i = 0; i < newPointsSize; ++i) {
-          colors[i] = 0xffff0000;
-      }
-
-      for (int i = newPointsSize; i < colorsSize; ++i) {
-          colors[i] = 0xFF000000;
-      }*/
-
     e->ReleaseFloatArrayElements(env, jNewPoints, newPoints, 0);
     e->ReleaseIntArrayElements(env, jColors, colorsPointer, 0);
 
     // Draw canvas
     e->CallVoidMethod(env, canvas, drawARGB, 255, 255, 255, 255);
+    auto startTime = clock();
+
     e->CallVoidMethod(env, canvas, drawVertices,
                       vertexMode, // mode
                       newPointsSize, // vertexCount
@@ -336,4 +336,8 @@ Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
                       0, // indexCount
                       paint // paint
     );
+    auto endTime = clock();
+
+
+    return (((double) (endTime - startTime)) / CLOCKS_PER_SEC);
 }

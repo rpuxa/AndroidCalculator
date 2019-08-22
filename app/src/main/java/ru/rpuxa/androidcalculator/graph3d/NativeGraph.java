@@ -28,6 +28,6 @@ public final class NativeGraph {
             float[] graph,
             float[] vertices);*/
 
-    public static native void draw(Canvas canvas, Paint paint, Camera camera, float[] graph, Graph3dParams params, Canvas.VertexMode mode);
+    public static native double draw(Canvas canvas, Paint paint, Camera camera, float[] graph, Graph3dParams params, Canvas.VertexMode mode);
 
 }
