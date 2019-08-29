@@ -11,7 +11,7 @@ struct polygon {
     float distanceToCamera;
 };
 
-float *mult_matrix(float *first, float *second) {
+float *multiply_matrices(float *first, float *second) {
     float *matrix = (float *) malloc(9 * sizeof(float));
     for (int i = 0; i < 9; ++i) {
         int row = i / 3;
@@ -62,7 +62,7 @@ void project_points(
     };
 
 
-    float *resultMatrix = mult_matrix(rotateZ, rotateX);
+    float *resultMatrix = multiply_matrices(rotateZ, rotateX);
 
     float resizeWidth = screenWidth / cameraWidth;
     float resizeHeight = -screenHeight / cameraHeight;
@@ -208,6 +208,7 @@ Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
     float polygonStart = e->CallFloatMethod(env, params, getPolygonStart);
 
     //////////////////////////////////////////////
+    auto startTime = clock();
 
     int totalPolygonsCount = polygonsAxisCount * polygonsAxisCount;
     struct polygon polygons[totalPolygonsCount];
@@ -314,13 +315,13 @@ Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
         }
         colors += 6;
     }
+    auto endTime = clock();
 
     e->ReleaseFloatArrayElements(env, jNewPoints, newPoints, 0);
     e->ReleaseIntArrayElements(env, jColors, colorsPointer, 0);
 
     // Draw canvas
     e->CallVoidMethod(env, canvas, drawARGB, 255, 255, 255, 255);
-    auto startTime = clock();
 
     e->CallVoidMethod(env, canvas, drawVertices,
                       vertexMode, // mode
@@ -336,7 +337,6 @@ Java_ru_rpuxa_androidcalculator_graph3d_NativeGraph_draw(
                       0, // indexCount
                       paint // paint
     );
-    auto endTime = clock();
 
 
     return (((double) (endTime - startTime)) / CLOCKS_PER_SEC);
